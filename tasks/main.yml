@@ -1,0 +1,13 @@
+---
+
+- name: "[ IOT Firewall Allow ] :: Add hosts in group to PFSense Alias"
+  template:
+    src: iot_firewall_allow.txt.j2
+    dest: "{{ iotfw_urltable_file }}"
+  delegate_to: "{{ iotfw_urltable_webserver_ip }}"
+  register: iot_firewall_list
+
+- name: "[ IOT Firewall Allow ] :: Update PFSense URLTable alias"
+  command: ssh {{ iotfw_pfsense_user }}@{{ iotfw_pfsense_ip }} sudo /usr/bin/nice -n20 /etc/rc.update_urltables now forceupdate
+  delegate_to: "{{ iotfw_urltable_webserver_ip }}"
+  when: iot_firewall_list is changed
